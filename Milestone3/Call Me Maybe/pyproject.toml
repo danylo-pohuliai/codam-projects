@@ -1,0 +1,28 @@
+[project]
+name = "call-me-maybe"
+version = "0.1.0"
+requires-python = ">=3.10"
+
+dependencies = [
+    "pydantic>=2.0.0",
+    "numpy>=1.26.0",
+    "llm_sdk",
+]
+
+[dependency-groups]
+dev = [
+    "black>=26.5.1",
+    "flake8>=7.0.0",
+    "mypy>=1.9.0",
+    "pytest>=8.0.0",
+]
+
+[tool.uv.sources]
+llm_sdk = { path = "./llm_sdk" }
+
+[tool.mypy]
+cache_dir = "/tmp/mypy_cache_call_me_maybe"
+
+[[tool.mypy.overrides]]
+module = "llm_sdk.*"
+ignore_errors = true

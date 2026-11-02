@@ -1,0 +1,223 @@
+*This project has been created as part of the 42 curriculum by svpanfil, dpohulia.*
+
+# A-Maze-ing
+
+## Description
+
+A-Maze-ing is a maze generator written in Python 3. It reads a configuration file, generates a randomised maze, and writes the result to an output file in hexadecimal wall encoding. The maze is then displayed in the terminal with an interactive menu that lets you regenerate, show or hide the solution path, change colours, and watch an animated path walkthrough.
+
+Key features:
+- Perfect mazes (exactly one path between any two points) and imperfect mazes (extra passages, multiple routes)
+- Embedded "42" pattern built from fully walled cells
+- BFS shortest-path solver
+- Reproducible generation via an optional seed
+- Terminal rendering with ANSI colours and animation
+
+## Instructions
+
+### Requirements
+
+- Python 3.10 or later
+- `mypy`, `flake8` (for linting)
+
+### Run
+
+```bash
+python3 a_maze_ing.py config.txt
+```
+
+`config.txt` is the configuration file (see format below). Any filename is accepted.
+
+### Makefile targets
+
+| Target | Action |
+|--------|--------|
+| `make install` | Install dependencies via pip |
+| `make run` | Run the program with the default `config.txt` |
+| `make debug` | Run with Python's built-in debugger (`pdb`) |
+| `make clean` | Remove `__pycache__` and `.mypy_cache` |
+| `make lint` | Run `flake8` and `mypy` with recommended flags |
+| `make lint-strict` | Run `flake8` and `mypy --strict` |
+
+### Interactive menu
+
+After the maze is drawn, the following options are available:
+
+```
+1. Regenerate          — generate a new random maze
+2. Show/hide path      — toggle the solution path arrows
+3. Rotate colors       — cycle the wall/42 pattern colours
+4. Animation 1           — animate the solution path step by step
+5. Animation 2			 — animate the solution path step by step
+6. Quit
+```
+
+## Configuration file format
+
+One `KEY=VALUE` pair per line. Lines starting with `#` are comments and are ignored.
+
+| Key | Required | Description | Example |
+|-----|----------|-------------|---------|
+| `WIDTH` | yes | Number of cells horizontally | `WIDTH=40` |
+| `HEIGHT` | yes | Number of cells vertically | `HEIGHT=16` |
+| `ENTRY` | yes | Entry coordinates `x,y` (col,row) | `ENTRY=0,7` |
+| `EXIT` | yes | Exit coordinates `x,y` (col,row) | `EXIT=39,15` |
+| `OUTPUT_FILE` | yes | Output filename (must end in `.txt`) | `OUTPUT_FILE=output_maze.txt` |
+| `PERFECT` | yes | `True` = perfect maze, `False` = imperfect | `PERFECT=False` |
+| `SEED` | no | Integer seed for reproducible generation | `SEED=32743` |
+
+Default `config.txt` is included in the repository.
+
+## Output file format
+
+- One hexadecimal digit per cell, walls encoded as bits: bit 0 = North, bit 1 = East, bit 2 = South, bit 3 = West. A `1` bit means the wall is closed.
+- Cells stored row by row, one row per line.
+- After an empty line: entry coordinates, exit coordinates, and the shortest path encoded as a sequence of `N`, `E`, `S`, `W` letters.
+
+## Maze generation algorithm
+
+The generator uses the **recursive backtracker** (randomised depth-first search):
+
+1. Start at the entry cell, mark it visited.
+2. Randomly pick an unvisited neighbour, remove the wall between them, move there.
+3. If no unvisited neighbours exist, backtrack along the stack.
+4. Repeat until all cells are visited.
+
+This always produces a **perfect maze** — a spanning tree of the cell graph, guaranteeing exactly one path between any two points.
+
+For **imperfect mazes** (`PERFECT=False`), roughly 20 % of the remaining walls are randomly removed after generation, subject to two constraints: no 3×3 open areas and no walls of the "42" pattern are touched.
+
+**Why this algorithm?** The recursive backtracker is straightforward to implement and reason about, produces mazes with long winding corridors (good visual quality), and integrates naturally with the "42" pattern (pre-marked cells are simply treated as permanently visited).
+
+## Reusable module — `MazeGenerator`
+
+The maze generator is a standalone module in `maze_generator.py`. It is packaged as `mazegen-*.whl`.
+
+### Install
+
+```bash
+pip install mazegen-1.0.0-py3-none-any.whl
+```
+
+### Basic usage
+
+```python
+from mazegen import MazeGenerator
+
+maze = MazeGenerator(
+    height=16,
+    width=40,
+    entry=(0, 7),              # (col, row)
+    exit_m=(39, 15),
+    output_file="output_maze.txt",
+    perfect=True,
+    seed=32743,                # optional; None for random
+)
+
+path = maze.solve()            # e.g. "EESSWN..."
+maze.print_maze_to_file("output_maze.txt", path)
+```
+
+For an imperfect maze, pass `perfect=False`.
+
+### Custom parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `height`, `width` | Maze size in cells |
+| `entry`, `exit_m` | Start and end as `(col, row)` |
+| `perfect` | `True` = perfect maze; `False` for imperfect |
+| `seed` | Integer for reproducible generation, or `None` |
+| `output_file` | Filename used for validation (must end in `.txt`) |
+
+### Accessing the structure and solution
+
+The in-memory maze is **not** the same format as the output file.
+
+**In memory** — `maze.grid.grid` is a `list[list[Cell]]`. Each `Cell` has wall flags (`1` = closed, `0` = open):
+
+```python
+cell = maze.grid.grid[row][col]
+cell.north, cell.east, cell.south, cell.west
+```
+
+**Solution** — `maze.solve()` returns the shortest path as a string of `N`, `E`, `S`, `W` letters.
+
+**Output file** — `print_maze_to_file()` writes one hex digit per cell (see [Output file format](#output-file-format)), then entry, exit, and the solution path.
+
+## Team and project management
+
+### Roles
+
+| Member | Responsibilities |
+|--------|-----------------|
+| **svpanfil** | Maze generation (recursive backtracker, perfect maze), terminal drawing |
+| **dpohulia** | Configuration file parser, BFS path solver, imperfect maze generation, terminal drawing |
+
+### Planning
+
+We split the work by layer: svpanfil owned the core generation engine while dpohulia built the I/O and solving layer. Both contributed to the visual rendering and interactive menu. We iterated on the drawing code together, adding colour support and animation as bonuses toward the end.
+
+### What worked well
+
+- Clean separation between the generator module and the main script made it easy to work in parallel without merge conflicts.
+- The recursive backtracker was fast to implement and easy to verify visually.
+- ANSI colour animation required no extra dependencies.
+
+### What could be improved
+
+- The `MazeConfig` dataclass uses `| None` fields validated at runtime; using a stricter type-safe approach from the start would have eliminated several mypy warnings.
+- More maze generation algorithms (Prim's, Kruskal's) could be added to compare visual styles.
+- Animation in terminal can be improved: instead of redraw full maze each time, it should redraw one cell
+
+### Tools used
+
+- **mypy** — static type checking
+- **flake8** — style linting
+- **Git** — version control and collaboration
+
+## Resources
+
+- [Maze generation algorithm — Wikipedia](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
+- [Recursive backtracker explanation — Think Labyrinth](https://www.astrolog.org/labyrnth/algrithm.htm)
+- [BFS shortest path — Wikipedia](https://en.wikipedia.org/wiki/Breadth-first_search)
+- [ANSI escape codes reference](https://en.wikipedia.org/wiki/ANSI_escape_code)
+- [Python `dataclasses` documentation](https://docs.python.org/3/library/dataclasses.html)
+- [mypy documentation](https://mypy.readthedocs.io/)
+
+### AI usage
+
+AI (Cursor / Claude) was used for:
+- Suggesting the ANSI escape sequence for clearing the terminal scrollback buffer
+- Debugging mypy `--strict` errors related to `tuple[int, int] | None` indexing
+- Explaining why row/col coordinate order matters when calling `is_42_cell`
+
+All AI-generated suggestions were reviewed, tested, and adapted before being included in the project.
+
+## Installation
+
+Create virtual environment:
+```shell
+python3 -m venv .venv
+```
+
+Activate virtual environment:
+```shell
+source .venv/bin/activate
+```
+
+Install build dependency:
+```shell
+pip install build
+```
+
+Build mazegen package:
+```shell
+python -m build
+```
+
+Install mazegen package:
+
+```bash
+pip install mazegen-1.0.0-py3-none-any.whl
+```

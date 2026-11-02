@@ -1,0 +1,13 @@
+# Default configuration for A-Maze-ing
+# One KEY=VALUE per line.
+# Lines starting with # are comments.
+# 238 max
+WIDTH=25
+# 117 max
+HEIGHT=25
+ENTRY=24,24
+EXIT=0,0
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+# Optional:
+# SEED=33

@@ -1,0 +1,126 @@
+[
+    {
+        "name": "fn_reject_unrelated_request",
+        "description": "Use this function if the user's request does not match any other available function.",
+        "parameters": {}
+    },
+    {
+        "name": "fn_set_device_state",
+        "description": "Change the state of a smart home device.",
+        "parameters": {
+            "device_name": {
+                "type": "string"
+            },
+            "is_on": {
+                "type": "boolean"
+            }
+        }
+    },
+    {
+        "name": "fn_calculate_loan",
+        "description": "Calculate loan details with floating point numbers.",
+        "parameters": {
+            "principal": {
+                "type": "number"
+            },
+            "rate_percent": {
+                "type": "number"
+            },
+            "include_taxes": {
+                "type": "boolean"
+            }
+        }
+    },
+    {
+        "name": "fn_create_user",
+        "description": "Create a user with mixed data types and specific formats like email.",
+        "parameters": {
+            "username": {
+                "type": "string"
+            },
+            "age": {
+                "type": "number"
+            },
+            "is_admin": {
+                "type": "boolean"
+            },
+            "email": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "name": "fn_send_bulk_messages",
+        "description": "Send a message to multiple tags using an array of strings.",
+        "parameters": {
+            "message": {
+                "type": "string"
+            },
+            "tags": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "urgent": {
+                "type": "boolean"
+            }
+        }
+    },
+    {
+        "name": "fn_process_sensor_data",
+        "description": "Process a list of numeric sensor readings.",
+        "parameters": {
+            "sensor_id": {
+                "type": "string"
+            },
+            "readings": {
+                "type": "array",
+                "items": {
+                    "type": "number"
+                }
+            }
+        }
+    },
+    {
+        "name": "fn_update_config",
+        "description": "Update complex device configuration using a nested JSON object.",
+        "parameters": {
+            "device_id": {
+                "type": "integer"
+            },
+            "settings": {
+                "type": "object",
+                "properties": {
+                    "theme": {
+                        "type": "string"
+                    },
+                    "auto_update": {
+                        "type": "boolean"
+                    },
+                    "max_retries": {
+                        "type": "number"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "fn_substitute_string_with_regex",
+        "description": "Replace all occurrences matching a regex pattern in a string.",
+        "parameters": {
+            "source_string": {
+                "type": "string"
+            },
+            "regex": {
+                "type": "string"
+            },
+            "replacement": {
+                "type": "string"
+            }
+        },
+        "returns": {
+            "type": "string"
+        }
+    }
+]

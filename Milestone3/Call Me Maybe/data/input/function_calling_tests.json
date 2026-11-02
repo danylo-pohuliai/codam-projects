@@ -1,0 +1,32 @@
+[
+    {
+        "prompt": "Turn off the living room AC."
+    },
+    {
+        "prompt": "Replace all the vowels in sentence 'Hello world!' with 3"
+    },
+    {
+        "prompt": "Register new admin user john_doe, age 34, email john.doe@gmail.com."
+    },
+    {
+        "prompt": "Make a regular user profile for Alice, she is 19. Her email is RabiAlice19@gmail.com."
+    },
+    {
+        "prompt": "Send urgent message 'Server going down in 5 mins' to tags dev, ops, and backend."
+    },
+    {
+        "prompt": "Send a non-urgent message saying 'Happy Friday' to the general tag."
+    },
+    {
+        "prompt": "Process sensor XT-900 with readings 12.5, 44.1, and 5.0."
+    },
+    {
+        "prompt": "Sensor temp_sensor_1 has flat readings: 0, 0, and 1."
+    },
+    {
+        "prompt": "Update device 8080 config: set theme to dark, turn on auto update, and set 5 max retries."
+    },
+    {
+        "prompt": "I want a pizza with extra cheese and pepperoni."
+    }
+]

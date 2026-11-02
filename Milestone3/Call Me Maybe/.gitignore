@@ -1,0 +1,7 @@
+.venv/
+.venv
+data/output/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.vscode/
